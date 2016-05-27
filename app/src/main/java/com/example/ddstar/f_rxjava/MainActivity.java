@@ -14,8 +14,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void doWork() {
-        CatHelper catHelper = new CatHelper();
-        catHelper.saveCutestCAt("www.baidu.cat.com", new CallBack<Uri>() {
+        new CatHelper().saveCutsetCat("www.baidu.cat.com").start(new CallBack<Uri>() {
             @Override
             public void onResult(Uri result) {
 
@@ -26,6 +25,17 @@ public class MainActivity extends AppCompatActivity {
 
             }
         });
+//        catHelper.saveCutestCat("www.baidu.cat.com", new CallBack<Uri>() {
+//            @Override
+//            public void onResult(Uri result) {
+//
+//            }
+//
+//            @Override
+//            public void onError(Exception e) {
+//
+//            }
+//        });
 //        catHelper.saveCutestCAt("www.baidu.cats.com", new CatHelper.CutestCatCallBack() {
 //            @Override
 //            public void onCatSaveSuccess(Uri uriAds) {
