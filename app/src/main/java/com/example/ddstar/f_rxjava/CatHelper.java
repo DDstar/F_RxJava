@@ -23,58 +23,73 @@ public class CatHelper {
         //调用Api建立获取猫的列表的任务
         final AsyncJob<List<Cat>> catListJob = apiWrapper1.queryCats(query);
         //新建获取最可爱的猫的任务
-        final AsyncJob<Cat> cutestCatJob = new AsyncJob<Cat>() {
+         final AsyncJob<Cat> cutestCatJob = catListJob.map(new Func<List<Cat>, Cat>() {
             @Override
-            public void start(final CallBack callBack) {
-                //在启动寻找最可爱的猫的任务时启动获取猫的列表
-                catListJob.start(new CallBack<List<Cat>>() {
-                    @Override
-                    public void onResult(List<Cat> result) {
-                        //获取到猫列表以后调用寻找最可爱猫的方法，
-                        // 将结果返回给获取最可爱的猫的回调
-                        callBack.onResult(findCutestCat(result));
-                    }
-
-                    @Override
-                    public void onError(Exception e) {
-                        callBack.onError(e);
-                    }
-                });
+            public Cat call(List<Cat> cats) {
+                return findCutestCat(cats);
             }
-        };
+        });
+//        final AsyncJob<Cat> cutestCatJob = new AsyncJob<Cat>() {
+//            @Override
+//            public void start(final CallBack callBack) {
+//                //在启动寻找最可爱的猫的任务时启动获取猫的列表
+//                catListJob.start(new CallBack<List<Cat>>() {
+//                    @Override
+//                    public void onResult(List<Cat> result) {
+//                        //获取到猫列表以后调用寻找最可爱猫的方法，
+//                        // 将结果返回给获取最可爱的猫的回调
+//                        callBack.onResult(findCutestCat(result));
+//                    }
+//
+//                    @Override
+//                    public void onError(Exception e) {
+//                        callBack.onError(e);
+//                    }
+//                });
+//            }
+//        };
         //新建获取最可爱猫的地址的任务
-        AsyncJob<Uri> catUriJob = new AsyncJob<Uri>() {
+
+
+        AsyncJob<Uri> catUriJob = cutestCatJob.flapMap(new Func<Cat, AsyncJob<Uri>>() {
             @Override
-            public void start(final CallBack<Uri> callBack) {
-                //在启动寻找最可爱的猫地址时
-                // 启动寻找最可爱的猫的任务
-                //并等待回调
-                cutestCatJob.start(new CallBack<Cat>() {
-                    @Override
-                    public void onResult(Cat result) {
-                        //获取到最可爱的猫对象时调用Api方法获取最可爱猫的地址
-                        apiWrapper1.store(result).start(new CallBack<Uri>() {
-                            @Override
-                            public void onResult(Uri result) {
-                                callBack.onResult(result);
-                            }
-
-                            @Override
-                            public void onError(Exception e) {
-                                callBack.onError(e);
-                            }
-                        });
-                    }
-
-                    @Override
-                    public void onError(Exception e) {
-                        callBack.onError(e);
-                    }
-                });
-
+            public AsyncJob<Uri> call(Cat cat) {
+                return apiWrapper1.store(cat);
             }
-        };
-        return  catUriJob;
+        });
+//        AsyncJob<Uri> catUriJob = new AsyncJob<Uri>() {
+//            @Override
+//            public void start(final CallBack<Uri> callBack) {
+//                //在启动寻找最可爱的猫地址时
+//                // 启动寻找最可爱的猫的任务
+//                //并等待回调
+//                cutestCatJob.start(new CallBack<Cat>() {
+//                    @Override
+//                    public void onResult(Cat result) {
+//                        //获取到最可爱的猫对象时调用Api方法获取最可爱猫的地址
+//                        apiWrapper1.store(result).start(new CallBack<Uri>() {
+//                            @Override
+//                            public void onResult(Uri result) {
+//                                callBack.onResult(result);
+//                            }
+//
+//                            @Override
+//                            public void onError(Exception e) {
+//                                callBack.onError(e);
+//                            }
+//                        });
+//                    }
+//
+//                    @Override
+//                    public void onError(Exception e) {
+//                        callBack.onError(e);
+//                    }
+//                });
+//
+//            }
+//        };
+//        return  catUriJob;
+        return  null;
     }
 
 //    public AsyncJob<Uri> saveCutsetCat(final String query) {

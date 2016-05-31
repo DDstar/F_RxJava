@@ -1,22 +1,28 @@
-package com.example.ddstar.f_rxjava;
+package com.toolbar.ddstar.frxjava2;
 
 /**
- * Created by DDstar on 2016/5/27.
+ * Created by DDstar on 2016/5/30.
  */
 public abstract class AsyncJob<T> {
-
     public abstract void start(CallBack<T> callBack);
 
-    public <R> AsyncJob<R> map(final Func<T, R> trFunc) {
-        final AsyncJob<T> curTask = this;
+    /**
+     * 映射新增加映射方法
+     *
+     * @param mapfun
+     * @param <R>
+     * @return
+     */
+    public <R> AsyncJob<R> map(final FunTR<T, R> mapfun) {
+        final AsyncJob<T> source = this;
         return new AsyncJob<R>() {
             @Override
             public void start(final CallBack<R> callBack) {
-                curTask.start(new CallBack<T>() {
+                source.start(new CallBack<T>() {
                     @Override
-                    public void onResult(T result) {
-                        R resutlR = trFunc.call(result);
-                        callBack.onResult(resutlR);
+                    public void onResult(T t) {
+                        R funCallReturn = mapfun.funCall(t);
+                        callBack.onResult(funCallReturn);
                     }
 
                     @Override
@@ -27,20 +33,19 @@ public abstract class AsyncJob<T> {
             }
         };
     }
-
-    public <R> AsyncJob<R> flapMap(final Func<T, AsyncJob<R>> func) {
-        final AsyncJob<T> srcJob = this;
+    public <R> AsyncJob<R> flatMap(final FunTR<T, AsyncJob<R>> flapMapfun) {
+        final AsyncJob<T> source = this;
         return new AsyncJob<R>() {
             @Override
             public void start(final CallBack<R> callBack) {
-                srcJob.start(new CallBack<T>() {
+                source.start(new CallBack<T>() {
                     @Override
-                    public void onResult(T result) {
-                        AsyncJob<R> resultAR = func.call(result);
-                        resultAR.start(new CallBack<R>() {
+                    public void onResult(T t) {
+                        AsyncJob<R> rAsyncJob = flapMapfun.funCall(t);
+                        rAsyncJob.start(new CallBack<R>() {
                             @Override
-                            public void onResult(R result) {
-                                callBack.onResult(result);
+                            public void onResult(R r) {
+                                callBack.onResult(r);
                             }
 
                             @Override
@@ -48,7 +53,6 @@ public abstract class AsyncJob<T> {
                                 callBack.onError(e);
                             }
                         });
-
                     }
 
                     @Override
@@ -59,6 +63,5 @@ public abstract class AsyncJob<T> {
             }
         };
     }
-
 
 }
